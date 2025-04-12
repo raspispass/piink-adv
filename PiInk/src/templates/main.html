@@ -1,0 +1,68 @@
+{% from 'bootstrap5/form.html' import render_form %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>PiInk</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    {% block styles %}
+    	<!-- Bootstrap CSS -->
+    	{{ bootstrap.load_css() }}
+    {% endblock %}
+</head>
+<body class="d-flex flex-column align-items-center">
+
+{% block scripts %}
+	<!-- Optional JavaScript -->
+	{{ bootstrap.load_js() }}
+{% endblock %}
+
+<h1>PiInk</h1>
+    {% if message %}
+        <div class="alert alert-primary w-75 mb-3" role="alert">{{ message }}</div>
+    {% endif %}
+
+    <div class="card w-75 mb-3">
+    	<div class="card-header fw-bold text-center">
+		Upload image
+        </div>
+        <div class="card-body">
+    	    {{ render_form(uploadForm) }}
+        </div>
+    </div>
+
+    <div class="card w-75 mb-3">
+    	<div class="card-header fw-bold text-center">
+	    PiInk settings
+        </div>
+        <div class="card-body">
+            {{ render_form(saveSettingsForm) }}
+        </div>
+    </div>
+
+    <div class="card w-75 mb-3">
+    	<div class="card-header fw-bold text-center">
+	    Display
+        </div>
+        <div class="card-body">
+	    <div class="d-flex flex-column gap-3">
+    	        {{ render_form(rotateForm) }}
+	        {{ render_form(ghostingForm) }}
+	    </div>
+        </div>
+    </div>
+
+    <div class="card w-75 mb-3">
+    	<div class="card-header fw-bold text-center">
+	    PiInk Power Options
+        </div>
+        <div class="card-body">
+	    <div class="d-flex flex-column gap-3">
+    	        {{ render_form(rebootForm) }}
+	        {{ render_form(shutdownForm) }}
+	    </div>
+        </div>
+    </div>
+</body>
+</html>
