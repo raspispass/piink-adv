@@ -6,11 +6,13 @@
 - The git repository is expected to be checked out in the users home directory '~/'
 
 ## Install python3 dependencies
-`python3 -m venv ~/env`
-`source ~/env/bin/activate`
-`pip3 install -r ~/PiInk/scripts/requirements.txt`
-`sudo apt update && sudo apt upgrade`
-`sudo apt install python3-dev`
+```
+python3 -m venv ~/env
+source ~/env/bin/activate
+pip3 install -r ~/PiInk/scripts/requirements.txt
+sudo apt update && sudo apt upgrade
+sudo apt install python3-dev jq
+```
 
 ## Change settings
 Search for "CHANGEME" in all files and change the settings (`e.g. grep -R "CHANGEME" *`)
@@ -18,3 +20,12 @@ Search for "CHANGEME" in all files and change the settings (`e.g. grep -R "CHANG
 ## Execute install script
 `chmod +x ~/PiInk/scripts/setup.sh`
 `~/PiInk/scripts/setup.sh`
+
+# Usage
+
+## Command line
+- curl -X POST -F file=@image.png 127.0.0.1 (Image image.png is displayed)
+- curl http://localhost/random (Random image is displayed)
+
+## Web UI
+![Web UI](screenshot-piink-ui.png "Screenshot of web UI")
