@@ -4,7 +4,7 @@ from flask import Flask, request, render_template
 from werkzeug.utils import secure_filename
 import json
 from PIL import ImageDraw,Image 
-from wtforms import SubmitField, FileField, RadioField, BooleanField
+from wtforms import SubmitField, FileField, RadioField, BooleanField, DecimalField
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileRequired, FileAllowed
 from flask_bootstrap import Bootstrap5
@@ -27,6 +27,15 @@ app.config['WTF_CSRF_ENABLED'] = False
 bootstrap = Bootstrap5(app)
 
 ## Helpers
+def getRandomImg():
+    # get random file in upload folder
+    pattern=path_upload + "/*"
+    files = list(filter(os.path.isfile, glob.glob(pattern)))
+    # select a random file
+    img_displayed = random.choice(files)
+    path_img_displayed = os.path.join(path_upload,img_displayed)
+    return path_img_displayed
+
 def getRecentImg():
     # get last modified file in upload folder
     pattern=path_upload + "/*"
@@ -55,6 +64,10 @@ class SaveSettingsForm(FlaskForm):
     orientation = RadioField('Choose display orientation:', validators=[InputRequired(message=None)], choices=[ ('horizontal', 'Horizontal (landscape)'), ('vertical', 'Vertical (portrait)')])
     aspratio = BooleanField('Adjust aspect ratio')
     zoom = BooleanField('Activate/deactivate zoom')
+    auto_img_randomize = BooleanField('Display random image after PiInk restart')
+    checkmail = BooleanField('Check mails on reboot (new images prioritized over random image display function)')
+    reboot_interval = DecimalField('Reboot interval (in seconds) - 1 hour: 3600, 1 day: 86400', places=0)
+    reboot_active = BooleanField('Activate or deactivate automatic shutdown and reboot')
     submit_save = SubmitField('Save settings')
 
 ## Webserver functions
@@ -69,7 +82,7 @@ def upload_file():
     shutdownForm = ShutdownForm()
     rotateForm = RotateForm()
     ghostingForm = GhostingForm()
-    saveSettingsForm = SaveSettingsForm(orientation=settings['orientation'], aspratio=settings['adjustAspectRatio'], zoom=settings['zoom'])
+    saveSettingsForm = SaveSettingsForm(orientation=settings['orientation'], aspratio=settings['adjustAspectRatio'], zoom=settings['zoom'], auto_img_randomize=settings['auto_img_randomize'], checkmail=settings['checkmail'], reboot_interval=settings['reboot_interval'], reboot_active=settings['reboot_active'])
 
     # Message
     message = ""
@@ -111,6 +124,10 @@ def upload_file():
         orientation = "horizontal"
         aspratio = False
         zoom = False
+        auto_img_randomize = False
+        checkmail = False
+        reboot_interval = 3600
+        reboot_active = False
 
         if saveSettingsForm.orientation.data:
             orientation = request.form["orientation"]
@@ -118,16 +135,40 @@ def upload_file():
             aspratio = request.form["aspratio"]
         if saveSettingsForm.zoom.data:
             zoom = request.form["zoom"]
+        if saveSettingsForm.auto_img_randomize.data:
+            auto_img_randomize = request.form["auto_img_randomize"]
+        if saveSettingsForm.checkmail.data:
+            checkmail = request.form["checkmail"]
+        if saveSettingsForm.reboot_interval.data:
+            reboot_interval = int(request.form["reboot_interval"])
+        if saveSettingsForm.reboot_active.data:
+            reboot_active = request.form["reboot_active"]
 
         settings = {
             "orientation" : orientation,
             "adjustAspectRatio" : aspratio,
             "zoom" : zoom,
+            "auto_img_randomize" : auto_img_randomize,
+            "checkmail" : checkmail,
+            "reboot_interval" : reboot_interval,
+            "reboot_active" : reboot_active,
         }
 
         saveSettings(settings)
         return render_template('main.html', uploadForm=uploadForm, rebootForm=rebootForm, shutdownForm=shutdownForm, rotateForm=rotateForm, ghostingForm=ghostingForm, saveSettingsForm=saveSettingsForm, message=message)
     return render_template('main.html', uploadForm=uploadForm, rebootForm=rebootForm, shutdownForm=shutdownForm, rotateForm=rotateForm, ghostingForm=ghostingForm, saveSettingsForm=saveSettingsForm, message=message)
+
+## Automatically show (random) image
+@app.route('/random', methods=['GET'])
+def randomImage():
+    # Load settings from config/settings.json
+    settings = loadSettings()
+    auto_img_randomize=settings['auto_img_randomize']
+    if auto_img_randomize == "y":
+        updateEink(getRandomImg(),settings)
+        return("Random image updated")
+    else:
+        return("Configuration for random image display is not activated")
 
 def loadSettings():
     # default init settings values
@@ -135,6 +176,10 @@ def loadSettings():
             "orientation" : "horizontal",
             "adjustAspectRatio" : True,
             "zoom" : True,
+            "auto_img_randomize" : False,
+            "checkmail" : False,
+            "reboot_interval" : 3600,
+            "reboot_active" : False,
     }
 
     # try opening existing settings file

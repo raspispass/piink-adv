@@ -7,6 +7,7 @@ import time
 import os
 import sys
 import json
+from werkzeug.utils import secure_filename
 
 #########################
 # Configuration
@@ -49,7 +50,11 @@ if status == "OK" and messages[0]:
                     # Parse a bytes email into a message object
                     message = email.message_from_bytes(response[1])
                     # Decode the email subject
-                    subject, encoding = email.header.decode_header(message["Subject"])[0]
+                    try:
+                        subject, encoding = email.header.decode_header(message["Subject"])[0]
+                    # When the subject is None or empty
+                    except TypeError:
+                        subject = ""
                     if isinstance(subject, bytes):
                         # If it's a bytes, decode to str
                         subject = subject.decode(encoding)
@@ -66,7 +71,7 @@ if status == "OK" and messages[0]:
                             content_disposition = str(part.get("Content-Disposition"))
                             if content_disposition is not None and "attachment" in content_disposition:
                                 # Download attachment
-                                filename = part.get_filename()
+                                filename = secure_filename(part.get_filename())
                                 if filename:
                                     # Set filename to 20250309--10-00_original-filename
                                     filename_mod = timestr + "_" + filename

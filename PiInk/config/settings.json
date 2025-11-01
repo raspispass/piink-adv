@@ -1,1 +1,1 @@
-{"orientation": "horizontal", "adjustAspectRatio": "y", "zoom": "y"}
+{"orientation": "horizontal", "adjustAspectRatio": "y", "zoom": "y", "auto_img_randomize": false, "checkmail": false, "reboot_interval": 3600, "reboot_active": false}
