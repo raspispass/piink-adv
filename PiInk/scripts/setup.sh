@@ -23,7 +23,7 @@ sudo systemctl enable piink
 
 echo "create crontab entry for automatic shutdown and reboot via RTC (works only with https://github.com/bablokb/pcb-pi-batman)"
 # Alternative without pcb-pi-batman shield, just regularly check for new incoming mails instead (configured via web ui):
-# sudo bash -c 'echo "*/10 *  * * *  user    /home/user/rtc-cron.sh" >> /etc/crontab'
+# sudo bash -c 'echo "*/10 *  * * *  root    /home/user/rtc-cron.sh" >> /etc/crontab'
 chmod +x ~/checkmail.py
 chmod +x ~/rtc-cron.sh
 sudo bash -c 'echo "@reboot	root	/home/user/rtc-cron.sh" >> /etc/crontab'

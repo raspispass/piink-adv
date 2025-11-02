@@ -1,3 +1,14 @@
+# PiInk Advanced - A Raspberry Pi Powered E-Ink Picture Frame
+The project's idea is mainly derived from https://github.com/tlstommy/PiInk . Modifications include:
+- Complete code rewrite (Web UI)
+- Check mail feature (receive image attachments via email)
+- Support of battery management pHat (https://github.com/bablokb/pcb-pi-batman)
+
+The hardware setup is:
+- Raspberry Pi (Zero 2 W)
+- E-Ink Display (Pimoroni Inky Impression E-Ink Display)
+- (optional) Battery Management PCB (https://github.com/bablokb/pcb-pi-batman)
+
 # Installation
 
 ## Requirements
@@ -18,8 +29,10 @@ sudo apt install python3-dev jq
 Search for "CHANGEME" in all files and change the settings (`e.g. grep -R "CHANGEME" *`)
 
 ## Execute install script
-`chmod +x ~/PiInk/scripts/setup.sh`
-`~/PiInk/scripts/setup.sh`
+```
+chmod +x ~/PiInk/scripts/setup.sh
+~/PiInk/scripts/setup.sh
+```
 
 # Usage
 
@@ -28,4 +41,5 @@ Search for "CHANGEME" in all files and change the settings (`e.g. grep -R "CHANG
 - curl http://localhost/random (Random image is displayed)
 
 ## Web UI
+URI: http://piink.local
 ![Web UI](screenshot-piink-ui.png "Screenshot of web UI")
