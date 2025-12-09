@@ -12,6 +12,9 @@ from wtforms.validators import InputRequired
 import glob
 from inky.auto import auto
 
+## Debugging
+DEBUG = True
+
 ## Initialization
 allowed_extensions = {'.png', '.jpg', '.jpeg','.webp'}
 path_script = os.path.dirname(os.path.dirname(__file__))
@@ -19,7 +22,8 @@ path_upload = os.path.join(path_script,"img")
 if not os.path.exists(path_upload):
    os.makedirs(path_upload)
 settings_file = os.path.join(path_script,"config/settings.json")
-inky_display = auto()
+if not DEBUG:
+   inky_display = auto()
 
 ## Init Flask
 app = Flask(__name__)
@@ -209,9 +213,11 @@ def updateEink(filename,settings):
         img = adjustAspectRatioAndZoom(img, aspratio, zoom)
 
         # Display the image
-        inky_display.set_image(img)
-        inky_display.show()
-        #img.show()
+        if not DEBUG:
+            inky_display.set_image(img)
+            inky_display.show()
+        else:
+            img.show()
 
 #clear the screen to prevent ghosting
 def clearScreen():
@@ -337,4 +343,7 @@ def rotateImage(deg, settings):
 #run button checks on gpio    
 if __name__ == '__main__':
     app.secret_key = str(random.randint(100000,999999))
-    app.run(host="0.0.0.0",port=80,debug=True)
+    if not DEBUG:
+        app.run(host="0.0.0.0",port=80,debug=True)
+    else:
+        app.run(host="0.0.0.0",port=8080,debug=True)
