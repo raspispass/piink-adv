@@ -280,17 +280,15 @@ def adjustAspectRatioAndZoom(img, aspratio, zoom):
     if aspratio == "y":
         dsp_w = 800
         dsp_h = 480
-        ratioWidth = dsp_w / img.width
-        ratioHeight = dsp_h / img.height
-        if ratioWidth < ratioHeight:
-            # It must be fixed by width
-            resizedWidth = dsp_w
-            resizedHeight = round(ratioWidth * img.height)
-        else:
-            # Fixed by height
-            resizedWidth = round(ratioHeight * img.width)
-            resizedHeight = dsp_h
-        imgResized = img.resize((resizedWidth, resizedHeight), Image.LANCZOS)
+        img_w = img.width
+        img_h = img.height
+
+        # Scale factor to fit into eink screen (up- or downscale)
+        scale = min(dsp_w / img_w, dsp_h / img_h)
+        resized_w = int(img_w * scale)
+        resized_h = int(img_h * scale)
+
+        imgResized = img.resize((resized_w, resized_h), Image.LANCZOS)
         background = Image.new('RGBA', (dsp_w, dsp_h), (0, 0, 0, 255))
 
         if zoom == "y":
