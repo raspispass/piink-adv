@@ -61,7 +61,9 @@ class RebootForm(FlaskForm):
 class ShutdownForm(FlaskForm):
     submit_shutdown = SubmitField('Shutdown')
 class RotateForm(FlaskForm):
-    submit_rotate = SubmitField('Rotate image')
+    submit_rotate_left = SubmitField("←")
+    submit_rotate_right = SubmitField("→")
+    submit_rotate_updown = SubmitField("↑↓")
 class GhostingForm(FlaskForm):
     submit_ghosting = SubmitField('Clear ghosting')
 class SaveSettingsForm(FlaskForm):
@@ -114,8 +116,12 @@ def upload_file():
         os.system("sudo shutdown")
 
     # Rotate clockwise
-    if rotateForm.submit_rotate.data and rotateForm.validate_on_submit():
+    if rotateForm.submit_rotate_left.data and rotateForm.validate_on_submit():
+        rotateImage(90, settings)
+    if rotateForm.submit_rotate_right.data and rotateForm.validate_on_submit():
         rotateImage(-90, settings)
+    if rotateForm.submit_rotate_updown.data and rotateForm.validate_on_submit():
+        rotateImage(180, settings)
 
     # Ghosting clears
     if ghostingForm.submit_ghosting.data and ghostingForm.validate_on_submit():
