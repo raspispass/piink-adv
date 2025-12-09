@@ -13,7 +13,7 @@ import glob
 from inky.auto import auto
 
 ## Debugging
-DEBUG = True
+DEBUG = False
 
 ## Initialization
 allowed_extensions = {'.png', '.jpg', '.jpeg','.webp'}
