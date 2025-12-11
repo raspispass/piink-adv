@@ -68,12 +68,12 @@ class GhostingForm(FlaskForm):
     submit_ghosting = SubmitField('Clear ghosting')
 class SaveSettingsForm(FlaskForm):
     orientation = RadioField('Choose display orientation:', validators=[InputRequired(message=None)], choices=[ ('horizontal', 'Horizontal (landscape)'), ('vertical', 'Vertical (portrait)')])
-    aspratio = BooleanField('Adjust aspect ratio')
-    zoom = BooleanField('Activate/deactivate zoom')
+    aspratio = BooleanField('Adjust aspect ratio (don\'t stretch image)')
+    zoom = BooleanField('Zoom image to fit frame (no black sides)')
     auto_img_randomize = BooleanField('Display random image after PiInk restart')
     checkmail = BooleanField('Check mails on reboot (new images prioritized over random image display function)')
     reboot_interval = DecimalField('Reboot interval (in seconds) - 1 hour: 3600, 1 day: 86400', places=0)
-    reboot_active = BooleanField('Activate or deactivate automatic shutdown and reboot')
+    reboot_active = BooleanField('Automatic shutdown and reboot')
     submit_save = SubmitField('Save settings')
 
 ## Webserver functions
