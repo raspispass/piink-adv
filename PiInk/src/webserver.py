@@ -3,7 +3,7 @@ import os,random
 from flask import Flask, request, render_template
 from werkzeug.utils import secure_filename
 import json
-from PIL import ImageDraw,Image 
+from PIL import ImageDraw,Image,ImageOps 
 from wtforms import SubmitField, FileField, RadioField, BooleanField, DecimalField
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileRequired, FileAllowed
@@ -280,46 +280,28 @@ def adjustAspectRatioAndZoom(img, aspratio, zoom):
     if aspratio == "y":
         dsp_w = 800
         dsp_h = 480
-        img_w = img.width
-        img_h = img.height
 
-        # Scale factor to fit into eink screen (up- or downscale)
-        scale = min(dsp_w / img_w, dsp_h / img_h)
-        resized_w = int(img_w * scale)
-        resized_h = int(img_h * scale)
-
-        imgResized = img.resize((resized_w, resized_h), Image.LANCZOS)
+        ratioWidth = dsp_w / img.width
+        ratioHeight = dsp_h / img.height
+        if ratioWidth < ratioHeight:
+            # It must be fixed by width
+            resizedWidth = dsp_w
+            resizedHeight = round(ratioWidth * img.height)
+        else:
+            # Fixed by height
+            resizedWidth = round(ratioHeight * img.width)
+            resizedHeight = dsp_h
+        imgResized = img.resize((resizedWidth, resizedHeight), Image.LANCZOS)
         background = Image.new('RGBA', (dsp_w, dsp_h), (0, 0, 0, 255))
 
         if zoom == "y":
-            img_w, img_h = imgResized.size
-
-            # aspect ratios
-            img_ar = img_w / img_h
-            dsp_ar = dsp_w / dsp_h
-
-            # crop width or height
-            if img_ar > dsp_ar:
-                # Crop width
-                new_width = int(img_h * dsp_ar)
-                left = (img_w - new_width) // 2
-                top = 0
-                right = left + new_width
-                bottom = img_h
-            else:
-                # Crop height
-                new_height = int(img_w / dsp_ar)
-                left = 0
-                top = (img_h - new_height) // 2
-                right = img_w
-                bottom = top + new_height
-
-            imgResized = imgResized.crop((left, top, right, bottom))
-
-            # Resize for width (if needed)
-            if imgResized.width != dsp_w:
-                imgResized = imgResized.resize((dsp_w, int(dsp_w * (imgResized.height / imgResized.width))), Image.LANCZOS)
-            img = imgResized
+            img_zoom = ImageOps.fit(
+                img,
+                (dsp_w, dsp_h),
+                method=Image.LANCZOS,
+                centering=(0.5, 0.5),
+            )
+            img = img_zoom
         else:
             #offset image for background and paste the image
             offset = (round((dsp_w - resizedWidth) / 2), round((dsp_h - resizedHeight) / 2))
